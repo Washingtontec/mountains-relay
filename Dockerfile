@@ -1,9 +1,10 @@
-FROM eclipse-temurin:17-jdk AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY RelayServer.java .
-RUN javac RelayServer.java
+COPY pom.xml .
+COPY RelayServer.java src/main/java/
+RUN mvn -q -e -B package
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY --from=build /app/RelayServer.class .
-CMD ["java", "RelayServer"]
+COPY --from=build /app/target/relay-1.0.jar app.jar
+CMD ["java", "-jar", "app.jar"]
